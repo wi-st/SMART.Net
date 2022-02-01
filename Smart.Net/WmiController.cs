@@ -9,6 +9,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” 
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Management;
 using System.Text;
@@ -157,5 +158,116 @@ namespace Simplified.IO
 
             return drives;
         }
+        
+        
+        public static DataTable GetWin32_OperatingSystem()
+        {
+            DataTable Win32_OperatingSystem = new DataTable();
+            Win32_OperatingSystem.Columns.Add("LastBootUpTime", typeof(string));
+            Win32_OperatingSystem.Columns.Add("FreeSpaceInPagingFiles", typeof(string));
+            Win32_OperatingSystem.Columns.Add("SizeStoredInPagingFiles", typeof(string));
+
+            foreach (ManagementBaseObject obj in new ManagementObjectSearcher(@"SELECT * FROM Win32_OperatingSystem")
+                .Get())
+            {
+                Win32_OperatingSystem.Rows.Add(new Object[]
+                                               {
+                                                   obj["LastBootUpTime"].ToString(),
+                                                   obj["FreeSpaceInPagingFiles"].ToString(),
+                                                   obj["SizeStoredInPagingFiles"].ToString()
+                                               });
+            }
+
+            return Win32_OperatingSystem;
+        }
+
+        public static DataTable GetWin32_PhysicalMemory()
+        {
+            DataTable Win32_PhysicalMemory = new DataTable();
+            Win32_PhysicalMemory.Columns.Add("Capacity", typeof(string));
+            Win32_PhysicalMemory.Columns.Add("Manufacturer", typeof(string));
+            Win32_PhysicalMemory.Columns.Add("PartNumber", typeof(string));
+            Win32_PhysicalMemory.Columns.Add("SerialNumber", typeof(string));
+            Win32_PhysicalMemory.Columns.Add("Speed", typeof(string));
+
+            foreach (ManagementBaseObject obj in
+                new ManagementObjectSearcher(@"SELECT * FROM Win32_PhysicalMemory").Get())
+            {
+                Win32_PhysicalMemory.Rows.Add(new Object[]
+                                              {
+                                                  obj["Capacity"].ToString(),
+                                                  obj["Manufacturer"].ToString(),
+                                                  obj["PartNumber"].ToString(),
+                                                  obj["SerialNumber"].ToString(),
+                                                  obj["Speed"].ToString()
+                                              });
+            }
+
+            return Win32_PhysicalMemory;
+        }
+
+        public static DataTable GetWin32_NetworkAdapter()
+        {
+            DataTable Win32_NetworkAdapter = new DataTable();
+            Win32_NetworkAdapter.Columns.Add("TimeOfLastReset", typeof(string));
+            Win32_NetworkAdapter.Columns.Add("MACAddress", typeof(string));
+            Win32_NetworkAdapter.Columns.Add("Description", typeof(string));
+
+            foreach (ManagementBaseObject obj in
+                new ManagementObjectSearcher(@"SELECT * FROM Win32_NetworkAdapter WHERE GUID IS NOT NULL").Get())
+            {
+                Win32_NetworkAdapter.Rows.Add(new Object[]
+                                              {
+                                                  obj["TimeOfLastReset"].ToString(),
+                                                  obj["MACAddress"].ToString(),
+                                                  obj["Description"].ToString()
+                                              });
+            }
+
+            return Win32_NetworkAdapter;
+        }
+
+        public static DataTable GetWin32_Services()
+        {
+            DataTable Win32_Services = new DataTable();
+            Win32_Services.Columns.Add("DisplayName", typeof(string));
+            Win32_Services.Columns.Add("State", typeof(string));
+
+            foreach (ManagementBaseObject obj in new ManagementObjectSearcher(
+                @"SELECT * FROM Win32_Service WHERE DisplayName LIKE '%SQL%'").Get())
+            {
+                Win32_Services.Rows.Add(new Object[]
+                                        {
+                                            obj["DisplayName"].ToString(),
+                                            obj["State"].ToString()
+                                        });
+            }
+
+            return Win32_Services;
+        }
+        
+        public static DataTable GetWin32_Process()
+        {
+            DataTable Win32_Process = new DataTable();
+            Win32_Process.Columns.Add("Caption", typeof(string));
+            Win32_Process.Columns.Add("CreationDate", typeof(string));
+            Win32_Process.Columns.Add("PeakPageFileUsage", typeof(string));
+            Win32_Process.Columns.Add("WriteOperationCount", typeof(string));
+
+            foreach (ManagementBaseObject obj in new ManagementObjectSearcher(
+                @"SELECT * FROM Win32_Process WHERE Caption LIKE '%WinCC%' OR Caption LIKE '%WST%'").Get())
+            {
+                Win32_Process.Rows.Add(new Object[]
+                                       {
+                                           obj["Caption"].ToString(),
+                                           obj["CreationDate"].ToString(),
+                                           obj["PeakPageFileUsage"].ToString(),
+                                           obj["WriteOperationCount"].ToString()
+                                       });
+            }
+
+            return Win32_Process;
+        }
+
     }
 }
